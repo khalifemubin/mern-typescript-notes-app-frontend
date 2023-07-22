@@ -87,8 +87,9 @@ export async function logout() {
 
 export async function fetchNotes(): Promise<Note[]> {
     const response = await fetchData(BASE_URL + "/notes", {
-        method: "GET"
-        , credentials: "include"
+        method: "GET",
+        credentials: "include",
+        mode: "no-cors",
     });
     return response.json();
 }
