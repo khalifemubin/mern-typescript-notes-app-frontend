@@ -23,17 +23,17 @@ const SignUpModal = ({ onDismiss, onSignUpSuccess }: SignUpModalProps) => {
     async function onSubmit(credentials: SignUpBody) {
         try {
             const newUser = await NotesApi.signUp(credentials);
+            localStorage.setItem('sess_user_id', newUser.sessionID);
             // localStorage.setItem('sess_user_id', newUser._id);
             onSignUpSuccess(newUser);
 
             setShowAlert(true);
             setAlertVariant("success");
-            setAlertMessage("Singup successfull");
+            setAlertMessage("Signup successfull!");
         } catch (error) {
             console.error(error);
             setShowAlert(true);
             setAlertVariant("danger");
-
             if (error instanceof ConflictError) {
                 setAlertMessage(error.message);
             } else {

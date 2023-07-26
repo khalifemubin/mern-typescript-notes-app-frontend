@@ -1,40 +1,92 @@
+import axios, { AxiosError } from 'axios';
 import { ConflictError, UnauthorisedError } from "../errors/http-errors";
 import { Note } from "../models/note";
 import { User } from "../models/user";
 
 const BASE_URL = process.env.REACT_APP_BACKEND_URL + "/api";
 
-async function fetchData(input: RequestInfo, init: RequestInit) {
-    // if (localStorage.getItem('sess_user_id')) {
-    //     init.headers = { 'Authorization': `Bearer ${localStorage.getItem('sess_user_id')}` }
-    // }
+const API = axios.create({ baseURL: BASE_URL })
 
-    const controller = new AbortController()
-    //10 seconds timeout
-    setTimeout(() => controller.abort(), 10000);
-    init.signal = controller.signal;
+API.interceptors.request.use((req) => {
+    if (localStorage.getItem('sess_user_id') && localStorage.getItem('sess_user_id') !== undefined) {
+        req.headers.authorization = `Bearer ${localStorage.getItem('sess_user_id')}`;
+        req.withCredentials = true;
+    }
 
-    const response = await fetch(input, init);
+    // req.timeout = 5000;
 
-    if (response.ok) {
-        return response
-    } else {
-        const errorBody = await response.json();
-        const errorMessage = errorBody.error;
+    return req;
+})
 
-        if (response.status === 401) {
+type GenericError = {
+    error: string
+}
+
+async function fetchData<T>(url: string, method: String, requestData: Object): Promise<T> {
+    console.log("Inside fetchData");
+    let response;
+
+    try {
+        switch (method) {
+            case "GET":
+                response = await API.get<T>(url).catch((err) => { throw (err) });
+                break;
+            case "POST":
+                response = await API.post<T>(url, requestData).catch((err) => { throw (err) });
+                break;
+            case "DELETE":
+                response = await API.delete<T>(url, requestData).catch((err) => { throw (err) });
+                break;
+            case "PATCH":
+                response = await API.patch<T>(url, requestData).catch((err) => { throw (err) });
+                break;
+        }
+
+        console.log(response)
+        console.log("end of fetchData");
+        return response?.data as T;
+    } catch (error) {
+        const err = error as AxiosError;
+        const errorMessage = (err.response?.data as GenericError).error;// response?.data as string;
+
+        console.log("Start Error body of fetchData ");
+        console.log(err);
+        // console.log(errorMessage);
+        console.log("End Error body of fetchData ");
+
+        if (err.response?.status === 401) {
             throw new UnauthorisedError(errorMessage);
-        } else if (response.status === 409) {
+        } else if (err.response?.status === 409) {
             throw new ConflictError(errorMessage);
         } else {
-            throw Error("Request failed with status: " + response.status + " , message: " + errorMessage);
+            throw Error("Request failed with status: " + err.response?.status + " , message: " + errorMessage);
         }
     }
 }
 
 export async function getLoggedInUser(): Promise<User> {
-    const response = await fetchData(BASE_URL + "/users", { method: "GET", credentials: "include" });
-    return response.json();
+    // let resBodyType:User;
+    const response = await fetchData<User>(BASE_URL + "/users", "GET", {});
+    console.log("Inisde getLoggedInUser");
+    console.log(response)
+    console.log("Inisde getLoggedInUser");
+    return response;
+
+    // try {
+    //     const response = await API.get<User>(`${BASE_URL}/users`);
+    //     return response.data;
+    // } catch (error) {
+    //     const err = error as AxiosError
+    //     const errorMessage = err.response?.data as string;
+
+    //     if (err.status === 401) {
+    //         throw new UnauthorisedError(errorMessage);
+    //     } else if (err.status === 409) {
+    //         throw new ConflictError(errorMessage);
+    //     } else {
+    //         throw Error("Request failed with status: " + err.status + " , message: " + errorMessage);
+    //     }
+    // }
 }
 
 export interface SignUpBody {
@@ -44,16 +96,11 @@ export interface SignUpBody {
 }
 
 export async function signUp(credentials: SignUpBody): Promise<User> {
-    const response = await fetchData(BASE_URL + "/users/signup",
-        {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json",
-            },
-            body: JSON.stringify(credentials),
-        });
-
-    return response.json();
+    // const response = await API.post(BASE_URL + "/users/signup", credentials, { headers: { "Content-Type": "application/json" } });
+    // return response.data;
+    const response = await fetchData<User>(BASE_URL + "/users/signup", "POST", credentials);
+    console.log("signUp response ", response);
+    return response;
 }
 
 export interface LoginBody {
@@ -62,36 +109,28 @@ export interface LoginBody {
 }
 
 export async function login(credentials: LoginBody): Promise<User> {
-    const response = await fetchData(BASE_URL + "/users/login", {
-        method: "POST",
-        headers: {
-            "Content-type": "application/json",
-            // "Access-Control-Allow-Credentials": "true",
-            // "Allow-Control-Allow-Origin": "*",
-        },
-        // mode: 'no-cors', // 'cors' by default
-        body: JSON.stringify(credentials),
-        credentials: 'include', // Include cookies with the request
-    });
-
-    return response.json();
+    // const response = await API.post(BASE_URL + "/users/login", credentials, { headers: { "Content-Type": "application/json" } });
+    // return response.data;
+    const response = await fetchData<User>(BASE_URL + "/users/login", "POST", credentials);
+    return response;
 }
 
 export async function logout() {
-    await fetchData(BASE_URL + "/users/logout", {
-        method: "POST",
-        credentials: 'include',
-    });
+    // await API.post(BASE_URL + "/users/logout", {}, { headers: { "Content-Type": "application/json" } });
+    await fetchData(BASE_URL + "/users/logout", "POST", {});
 }
 
-
 export async function fetchNotes(): Promise<Note[]> {
-    const response = await fetchData(BASE_URL + "/notes", {
-        method: "GET",
-        credentials: "include",
-        mode: "no-cors",
-    });
-    return response.json();
+    // const response = await API.get(BASE_URL + "/notes");
+    // return response.data;
+    const response = await fetchData<Note[]>(BASE_URL + "/notes", "GET", {});
+
+    console.log("Inisde fetchNotes");
+    console.log(response)
+    console.log("Inisde fetchNotes");
+
+
+    return response;
 }
 
 export interface NoteInput {
@@ -100,34 +139,22 @@ export interface NoteInput {
 }
 
 export async function createNote(note: NoteInput): Promise<Note> {
-    const response = await fetchData(BASE_URL + "/notes",
-        {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(note),
-            credentials: "include"
-        });
-
-    return response.json();
+    // const response = await API.post(BASE_URL + "/notes", note, { headers: { "Content-Type": "application/json" } });
+    // return response.data;
+    const response = await fetchData<Note>(BASE_URL + "/notes", "POST", note);
+    return response;
 }
 
-export async function deleteNote(noteId: string) {
-    await fetchData(BASE_URL + "/notes/" + noteId, { method: "DELETE", credentials: "include" });
+export async function deleteNote(noteId: number) {
+    // export async function deleteNote(noteId: string) {
+    // await API.delete(BASE_URL + "/notes/" + noteId);
+    await fetchData(BASE_URL + "/notes/" + noteId, "DELETE", {});
 }
 
-export async function updateNote(noteId: string, note: NoteInput): Promise<Note> {
-    const response = await fetchData(BASE_URL + "/notes/" + noteId,
-        {
-            method: "PATCH",
-            headers: {
-                "Content-type": "application/json",
-            },
-            body: JSON.stringify(note),
-            credentials: "include",
-        });
-
-    return response.json();
+export async function updateNote(noteId: number, note: NoteInput): Promise<Note> {
+    // export async function updateNote(noteId: string, note: NoteInput): Promise<Note> {
+    // const response = await API.patch(BASE_URL + "/notes/" + noteId, note, { headers: { "Content-Type": "application/json" } });
+    // return response.data;
+    const response = await fetchData<Note>(BASE_URL + "/notes/" + noteId, "PATCH", note);
+    return response;
 }

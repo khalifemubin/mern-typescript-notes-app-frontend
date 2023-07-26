@@ -25,6 +25,7 @@ const LoginModal = ({ onDismiss, onLoginSuccess }: loginModalProps) => {
         try {
 
             const user = await NotesApi.login(credentials);
+            localStorage.setItem('sess_user_id', user.sessionID);
             // localStorage.setItem('sess_user_id', user._id);
             onLoginSuccess(user);
 

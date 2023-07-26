@@ -28,10 +28,13 @@ const AddEditNoteDialog = ({ noteToEdit, onDismiss, onNoteSaved }: AddEditNoteDi
             let noteResponse: Note;
 
             if (noteToEdit) {
-                noteResponse = await NotesApi.updateNote(noteToEdit._id, input);
+                noteResponse = await NotesApi.updateNote(noteToEdit.id, input);
+                // noteResponse = await NotesApi.updateNote(noteToEdit._id, input);
             } else {
                 noteResponse = await NotesApi.createNote(input);
             }
+
+            console.log(noteResponse);
 
             onNoteSaved(noteResponse);
             setShowAlert(true);

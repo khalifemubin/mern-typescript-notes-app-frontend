@@ -40,16 +40,19 @@ const NotesPageLoggedInView = () => {
 
     async function deleteNote(note: NoteModel) {
         try {
-            await NotesApi.deleteNote(note._id);
-            setNotes(notes.filter(existingNote => existingNote._id !== note._id))
+            await NotesApi.deleteNote(note.id);
+            setNotes(notes.filter(existingNote => existingNote.id !== note.id))
+            // await NotesApi.deleteNote(note._id);
+            // setNotes(notes.filter(existingNote => existingNote._id !== note._id))
         } catch (error) {
             console.error(error);
         }
     }
 
     const notesGrid = <Row xs={1} md={2} lg={3} className={`g-4 ${styles.notesGrid}`}>
-        {notes.map(note => (
-            <Col key={note._id}>
+        {notes?.map(note => (
+            <Col key={note.id}>
+                {/* <Col key={note._id}> */}
                 <Note note={note} className={styles.note} onDeleteNoteClicked={deleteNote} onNoteClicked={setNoteToEdit} />
             </Col>
         ))}
@@ -66,7 +69,7 @@ const NotesPageLoggedInView = () => {
             {showNotesLoadingError && <p className='text-danger'>Something went wrong! Please refresh the page</p>}
             {!notesLoading && !showNotesLoadingError &&
                 <>
-                    {notes.length > 0
+                    {notes?.length > 0
                         ? notesGrid
                         :
                         <p>You don't have any notes yet</p>
@@ -88,7 +91,8 @@ const NotesPageLoggedInView = () => {
                     noteToEdit={noteToEdit}
                     onDismiss={() => { setShowAddEditNoteDialog(false); setNoteToEdit(null); }}
                     onNoteSaved={(updatedNote) => {
-                        setNotes(notes.map(existingNote => existingNote._id === updatedNote._id ? updatedNote : existingNote));
+                        setNotes(notes.map(existingNote => existingNote.id === updatedNote.id ? updatedNote : existingNote));
+                        // setNotes(notes.map(existingNote => existingNote._id === updatedNote._id ? updatedNote : existingNote));
                         setNoteToEdit(null);
                     }}
                 />
