@@ -49,10 +49,10 @@ async function fetchData<T>(url: string, method: String, requestData: Object): P
         const err = error as AxiosError;
         const errorMessage = (err.response?.data as GenericError).error;// response?.data as string;
 
-        console.log("Start Error body of fetchData ");
-        console.log(err);
-        // console.log(errorMessage);
-        console.log("End Error body of fetchData ");
+        // console.log("Start Error body of fetchData ");
+        // console.log(err);
+        // // console.log(errorMessage);
+        // console.log("End Error body of fetchData ");
 
         if (err.response?.status === 401) {
             throw new UnauthorisedError(errorMessage);
@@ -156,5 +156,13 @@ export async function updateNote(noteId: number, note: NoteInput): Promise<Note>
     // const response = await API.patch(BASE_URL + "/notes/" + noteId, note, { headers: { "Content-Type": "application/json" } });
     // return response.data;
     const response = await fetchData<Note>(BASE_URL + "/notes/" + noteId, "PATCH", note);
+    return response;
+}
+
+export async function deleteAccount(): Promise<Note> {
+    // export async function updateNote(noteId: string, note: NoteInput): Promise<Note> {
+    // const response = await API.patch(BASE_URL + "/notes/" + noteId, note, { headers: { "Content-Type": "application/json" } });
+    // return response.data;
+    const response = await fetchData<Note>(BASE_URL + "/users/delete-account", "POST", {});
     return response;
 }
