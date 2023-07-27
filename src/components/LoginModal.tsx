@@ -1,6 +1,6 @@
 import { User } from "../models/user";
 import { LoginBody } from "../network/notes_api";
-import { Alert, Button, Form, Modal } from "react-bootstrap";
+import { Alert, Button, Form, Modal, Spinner } from "react-bootstrap";
 import { useState } from "react";
 import * as NotesApi from "../network/notes_api";
 import TextInputField from "./form/TextInputField";
@@ -16,6 +16,8 @@ interface loginModalProps {
 const LoginModal = ({ onDismiss, onLoginSuccess }: loginModalProps) => {
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginBody>();
 
+    const [loginLoading, setLoginLoading] = useState(false);
+
     const [showAlert, setShowAlert] = useState(false);
     const [alertVariant, setAlertVariant] = useState("");
     const [alertMessage, setAlertMessage] = useState("");
@@ -23,10 +25,11 @@ const LoginModal = ({ onDismiss, onLoginSuccess }: loginModalProps) => {
 
     async function onSubmit(credentials: LoginBody) {
         try {
-
+            setLoginLoading(true);
             const user = await NotesApi.login(credentials);
             localStorage.setItem('sess_user_id', user.sessionID);
             // localStorage.setItem('sess_user_id', user._id);
+
             onLoginSuccess(user);
 
             setShowAlert(true);
@@ -43,6 +46,8 @@ const LoginModal = ({ onDismiss, onLoginSuccess }: loginModalProps) => {
                 // setAlertMessage("Operation Error. Please try again later");
                 setAlertMessage("Invaid Credentials!");
             }
+        } finally {
+            setLoginLoading(false);
         }
     }
 
@@ -74,6 +79,7 @@ const LoginModal = ({ onDismiss, onLoginSuccess }: loginModalProps) => {
                         registerOptions={{ required: "Required" }}
                         error={errors.password}
                     />
+                    {loginLoading && <Spinner animation='border' variant='primary' />}
                     <Button
                         type="submit"
                         className={styleUtils.width100}

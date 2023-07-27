@@ -1,4 +1,4 @@
-import { Button } from "react-bootstrap";
+import AuthButtons from "./AuthButtons";
 
 interface NavBarLoggedOutViewProps {
     onSignUpClicked: () => void,
@@ -8,8 +8,9 @@ interface NavBarLoggedOutViewProps {
 const NavBarLoggedOutView = ({ onSignUpClicked, onLoginClicked }: NavBarLoggedOutViewProps) => {
     return (
         <>
-            <Button onClick={onSignUpClicked}>Sign Up</Button>
-            <Button onClick={onLoginClicked}>Log In</Button>
+            <AuthButtons onSignUpClicked={onSignUpClicked} onLoginClicked={onLoginClicked} />
+            {/* <Button id="navBarSignUpBtn" onClick={onSignUpClicked}>Sign Up</Button>
+            <Button id="navBarLoginBtn" onClick={onLoginClicked}>Log In</Button> */}
         </>
     );
 }

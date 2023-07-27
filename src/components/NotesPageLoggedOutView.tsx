@@ -1,7 +1,18 @@
+import AuthButtons from "./AuthButtons";
 
-const NotesPageLoggedOutView = () => {
+interface NotesPageLoggedOutViewProps {
+    onSignUpClicked: () => void,
+    onLoginClicked: () => void,
+}
+
+const NotesPageLoggedOutView = ({ onSignUpClicked, onLoginClicked }: NotesPageLoggedOutViewProps) => {
+
+
     return (
-        <p>Please log in to see your notes</p>
+        // <p>Please log in to see your notes</p>
+        <>
+            <AuthButtons onSignUpClicked={onSignUpClicked} onLoginClicked={onLoginClicked} />
+        </>
     );
 }
 

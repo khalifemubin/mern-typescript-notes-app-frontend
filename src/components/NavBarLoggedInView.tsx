@@ -1,4 +1,4 @@
-import { Button, NavDropdown, NavItem, Navbar } from "react-bootstrap";
+import { NavDropdown, Navbar } from "react-bootstrap";
 import { User } from "../models/user";
 import * as NotesApi from "../network/notes_api";
 
@@ -31,10 +31,6 @@ const NavBarLoggedInView = ({ user, onLogoutSuccess }: NavBarLoggedInViewProps) 
             }
         }
     }
-
-    console.log("Logged User View");
-    console.log(user);
-    console.log("Logged User View");
 
     return (
         <>

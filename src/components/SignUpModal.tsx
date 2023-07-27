@@ -3,7 +3,7 @@ import { User } from "../models/user";
 import { SignUpBody } from "../network/notes_api";
 import { useState } from "react";
 import * as NotesApi from "../network/notes_api";
-import { Alert, Button, Form, Modal } from "react-bootstrap";
+import { Alert, Button, Form, Modal, Spinner } from "react-bootstrap";
 import TextInputField from "./form/TextInputField";
 import styleUtils from "../styles/utils.module.css";
 import { ConflictError } from "../errors/http-errors";
@@ -15,6 +15,7 @@ interface SignUpModalProps {
 
 const SignUpModal = ({ onDismiss, onSignUpSuccess }: SignUpModalProps) => {
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<SignUpBody>();
+    const [signUpLoading, setSignUpLoading] = useState(false);
 
     const [showAlert, setShowAlert] = useState(false);
     const [alertVariant, setAlertVariant] = useState("");
@@ -22,6 +23,7 @@ const SignUpModal = ({ onDismiss, onSignUpSuccess }: SignUpModalProps) => {
 
     async function onSubmit(credentials: SignUpBody) {
         try {
+            setSignUpLoading(true);
             const newUser = await NotesApi.signUp(credentials);
             localStorage.setItem('sess_user_id', newUser.sessionID);
             // localStorage.setItem('sess_user_id', newUser._id);
@@ -39,6 +41,8 @@ const SignUpModal = ({ onDismiss, onSignUpSuccess }: SignUpModalProps) => {
             } else {
                 setAlertMessage("Operation error! Unable to Signup");
             }
+        } finally {
+            setSignUpLoading(false);
         }
     }
 
@@ -79,6 +83,7 @@ const SignUpModal = ({ onDismiss, onSignUpSuccess }: SignUpModalProps) => {
                         registerOptions={{ required: "Required" }}
                         error={errors.password}
                     />
+                    {signUpLoading && <Spinner animation='border' variant='primary' />}
                     <Button
                         type="submit"
                         disabled={isSubmitting}

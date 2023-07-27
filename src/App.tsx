@@ -20,16 +20,16 @@ function App() {
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
-    async function fetcLoggedInUser() {
+    async function fetchLoggedInUser() {
       try {
         const user = await NotesApi.getLoggedInUser();
         setLoggedInUser(user);
       } catch (error) {
         // console.log(error);
-        console.log("Operation error to determine if user is logged in or not");
+        // console.log("Operation error to determine if user is logged in or not");
       }
     }
-    fetcLoggedInUser();
+    fetchLoggedInUser();
   }, []);
 
   return (
@@ -44,7 +44,8 @@ function App() {
 
         <Container className={styles.pageContainer}>
           <Routes>
-            <Route path='/' element={<NotesPage loggedInUser={loggedInUser} />}></Route>
+            <Route path='/' element={<NotesPage loggedInUser={loggedInUser} onSignUpClick={() => setShowSignUpModal(true)}
+              onLoginClick={() => setShowLoginModal(true)} />}></Route>
             <Route path='/privacy' element={<PrivacyPolicy />}></Route>
             <Route path='/*' element={<NotFoundPage />}></Route>
           </Routes>
