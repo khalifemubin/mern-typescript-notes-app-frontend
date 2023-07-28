@@ -67,9 +67,6 @@ async function fetchData<T>(url: string, method: String, requestData: Object): P
 export async function getLoggedInUser(): Promise<User> {
     // let resBodyType:User;
     const response = await fetchData<User>(BASE_URL + "/users", "GET", {});
-    console.log("Inisde getLoggedInUser");
-    console.log(response)
-    console.log("Inisde getLoggedInUser");
     return response;
 
     // try {
@@ -164,5 +161,14 @@ export async function deleteAccount(): Promise<Note> {
     // const response = await API.patch(BASE_URL + "/notes/" + noteId, note, { headers: { "Content-Type": "application/json" } });
     // return response.data;
     const response = await fetchData<Note>(BASE_URL + "/users/delete-account", "POST", {});
+    return response;
+}
+
+export interface ForgotPasswordBody {
+    email: string
+}
+
+export async function requestPasswordReset(email: ForgotPasswordBody) {
+    const response = await fetchData<Note>(BASE_URL + "/users/request-password-reset", "POST", { email });
     return response;
 }

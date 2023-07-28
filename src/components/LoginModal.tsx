@@ -79,7 +79,7 @@ const LoginModal = ({ onDismiss, onLoginSuccess }: loginModalProps) => {
                         registerOptions={{ required: "Required" }}
                         error={errors.password}
                     />
-                    {loginLoading && <Spinner animation='border' variant='primary' />}
+                    {loginLoading && <Spinner animation='border' variant='primary' className="mt-4 d-flex justify-content-center" />}
                     <Button
                         type="submit"
                         className={styleUtils.width100}
@@ -87,6 +87,7 @@ const LoginModal = ({ onDismiss, onLoginSuccess }: loginModalProps) => {
                     >
                         Log In
                     </Button>
+                    <a href="/forgot-password" className="mt-4 d-flex justify-content-center">Forgot Password?</a>
                 </Form>
             </Modal.Body>
         </Modal>

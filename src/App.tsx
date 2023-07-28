@@ -11,6 +11,7 @@ import NotesPage from './pages/NotesPage';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import NotFoundPage from './pages/NotFoundPage';
 import styles from "./styles/App.module.css";
+import ForgotPassword from './pages/ForgotPassword';
 
 function App() {
   // const [clickCount, setClickCount] = useState(0);
@@ -47,6 +48,9 @@ function App() {
             <Route path='/' element={<NotesPage loggedInUser={loggedInUser} onSignUpClick={() => setShowSignUpModal(true)}
               onLoginClick={() => setShowLoginModal(true)} />}></Route>
             <Route path='/privacy' element={<PrivacyPolicy />}></Route>
+            {!loggedInUser &&
+              <Route path='/forgot-password' element={<ForgotPassword />}></Route>
+            }
             <Route path='/*' element={<NotFoundPage />}></Route>
           </Routes>
         </Container>
