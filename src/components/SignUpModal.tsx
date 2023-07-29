@@ -83,7 +83,7 @@ const SignUpModal = ({ onDismiss, onSignUpSuccess }: SignUpModalProps) => {
                         registerOptions={{ required: "Required" }}
                         error={errors.password}
                     />
-                    {signUpLoading && <Spinner animation='border' variant='primary' />}
+                    {signUpLoading && <Spinner animation='border' variant='primary' className="mt-4 d-flex justify-content-center" />}
                     <Button
                         type="submit"
                         disabled={isSubmitting}

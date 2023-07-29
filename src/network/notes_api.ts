@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import { ConflictError, UnauthorisedError } from "../errors/http-errors";
+import { ConflictError, UnauthorisedError, NotFoundError } from "../errors/http-errors";
 import { Note } from "../models/note";
 import { User } from "../models/user";
 
@@ -23,7 +23,7 @@ type GenericError = {
 }
 
 async function fetchData<T>(url: string, method: String, requestData: Object): Promise<T> {
-    console.log("Inside fetchData");
+    // console.log("Inside fetchData");
     let response;
 
     try {
@@ -42,8 +42,8 @@ async function fetchData<T>(url: string, method: String, requestData: Object): P
                 break;
         }
 
-        console.log(response)
-        console.log("end of fetchData");
+        // console.log(response)
+        // console.log("end of fetchData");
         return response?.data as T;
     } catch (error) {
         const err = error as AxiosError;
@@ -58,6 +58,8 @@ async function fetchData<T>(url: string, method: String, requestData: Object): P
             throw new UnauthorisedError(errorMessage);
         } else if (err.response?.status === 409) {
             throw new ConflictError(errorMessage);
+        } else if (err.response?.status === 404) {
+            throw new NotFoundError(errorMessage);
         } else {
             throw Error("Request failed with status: " + err.response?.status + " , message: " + errorMessage);
         }
@@ -169,6 +171,17 @@ export interface ForgotPasswordBody {
 }
 
 export async function requestPasswordReset(email: ForgotPasswordBody) {
-    const response = await fetchData<Note>(BASE_URL + "/users/request-password-reset", "POST", { email });
+    const response = await fetchData<Note>(BASE_URL + "/users/request-password-reset", "POST", email);
+    return response;
+}
+
+export interface ResetPasswordBody {
+    new_password: string,
+    confirmNewPassword: string,
+    actionToken: string
+}
+
+export async function resetPassword(requestBody: ResetPasswordBody) {
+    const response = await fetchData<Note>(BASE_URL + "/users/reset-password", "POST", requestBody);
     return response;
 }
